@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="楽天市場の男女別及び年代別ランキングを比較出来ます。" />
+    <title>楽天市場年代別ランキング</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.2.33/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        #itemName {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 4;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- ヘッダ -->
+        <div class="columns is-multiline is-vcentered">
+            <div class="column is-12 ">
+                <div class="box has-background-success-dark">
+                    <div class="columns">
+                        <div class="column">
+                            <h1 class="title is-size-4 has-text-centered has-text-white">楽天市場年代別ランキング
+                                <!-- Rakuten Web Services Attribution Snippet FROM HERE -->
+                                <a href="https://webservice.rakuten.co.jp/" target="_blank"><img
+                                        src="https://webservice.rakuten.co.jp/img/credit/200709/credit_22121.gif"
+                                        border="0" alt="Rakuten Web Service Center" title="Rakuten Web Service Center"
+                                        width="221" height="21" /></a>
+                                <!-- Rakuten Web Services Attribution Snippet TO HERE -->
+                            </h1>
+                        </div>
+                        <div class="column">
+                            <h2 class="is-size-5 has-text-centered has-text-light">{{ datas.title }}</h2>
+                        </div>
+                        <div class="column">
+                            <p class="is-size-6 has-text-centered has-text-light">更新日: {{ datas.lastBuildDate }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-4-widescreen is-12-desktop is-12-tablet">
+                <div class="box">
+                    <div class="content">
+                        <p class="is-size-7 has-text-centered">
+                            このページは楽天市場の男女別及び年代別ランキングを比較する為に作成しました。ボタンを押すと30位までのランキングが表示されます。ランキングの取得には<a
+                                href="https://webservice.rakuten.co.jp/documentation/ichiba-item-ranking">楽天商品ランキングAPI</a>
+                            を利用しています。</p>
+                        <div class="buttons are-small has-addons is-centered">
+                            <button class="button is-link is-outlined" v-on:click="getApi(0)">男性</button>
+                            <button class="button is-link is-outlined" v-on:click="getApi(0, 10)">10代</button>
+                            <button class="button is-link is-outlined" v-on:click="getApi(0, 20)">20代</button>
+                            <button class="button is-link is-outlined" v-on:click="getApi(0, 30)">30代</button>
+                            <button class="button is-link is-outlined" v-on:click="getApi(0, 40)">40代</button>
+                            <button class="button is-link is-outlined" v-on:click="getApi(0, 50)">50代以上</button>
+                        </div>
+                        <div class="buttons are-small has-addons is-centered">
+                            <button class="button is-danger is-outlined" v-on:click="getApi(1)">女性</button>
+                            <button class="button is-danger is-outlined" v-on:click="getApi(1, 10)">10代</button>
+                            <button class="button is-danger is-outlined" v-on:click="getApi(1, 20)">20代</button>
+                            <button class="button is-danger is-outlined" v-on:click="getApi(1, 30)">30代</button>
+                            <button class="button is-danger is-outlined" v-on:click="getApi(1, 40)">40代</button>
+                            <button class="button is-danger is-outlined" v-on:click="getApi(1, 50)">50代以上</button>
+                        </div>
+                        <div class="buttons are-small has-addons is-centered">
+                            <button class="button is-primary is-outlined" v-on:click="getApi()">総合</button>
+                            <button class="button is-primary is-outlined"
+                                v-on:click="getApi(undefined, 10)">10代</button>
+                            <button class="button is-primary is-outlined"
+                                v-on:click="getApi(undefined, 20)">20代</button>
+                            <button class="button is-primary is-outlined"
+                                v-on:click="getApi(undefined, 30)">30代</button>
+                            <button class="button is-primary is-outlined"
+                                v-on:click="getApi(undefined, 40)">40代</button>
+                            <button class="button is-primary is-outlined"
+                                v-on:click="getApi(undefined, 50)">50代以上</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- メインコンテンツ -->
+            <div class="column is-2-widescreen is-6-desktop is-12-tablet" v-for="data in datas.Items"
+                :key="data.Item.rank">
+                <div class="box">
+                    <div class="tile is-ancestor">
+                        <div class="tile is-parent">
+                            <a v-bind:href="data.Item.itemUrl">
+                                <div class="tile is-parent">
+                                    <div class="tile is-child">
+                                        <img v-bind:src="data.Item.mediumImageUrls[0].imageUrl">
+                                    </div>
+                                    <div class="has-text-centered  p-3">
+                                        <div class="has-background-danger-light my-5">
+                                            <strong>
+                                                {{ data.Item.rank }}位
+                                            </strong>
+                                        </div>
+                                        <div>
+                                            {{ Number(data.Item.itemPrice).toLocaleString() }}円
+                                        </div>
+                                    </div>
+                                </div>
+                                <p id="itemName" class="tile is-child is-size-7">
+                                    {{ data.Item.itemName }}
+                                </p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer has-background-success-dark">
+        <div class="content">
+            <div class="level level-right">
+                <div class="level-item">
+                    <a class="has-text-white" href="https://bubudoufu.com/privacy-policy1/">
+                        <p>
+                            ・プライバシーポリシー
+                        </p>
+                    </a>
+                    <a class="has-text-white" href="https://bubudoufu.com/form/">
+                        <p>
+                            ・お問い合わせフォーム
+                        </p>
+                    </a>
+                </div>
+            </div>
+            <div class="has-text-centered">
+                <a class="has-text-white" href="https://bubudoufu.com/webapp/">
+                    (c) bubudoufu.com
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
